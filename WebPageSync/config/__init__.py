@@ -4,7 +4,7 @@ Config module.
 from .develop import DevelopmentConfig
 
 CONFIG = {
-    'development': DevelopmentConfig,
+    'develop': DevelopmentConfig,
     'production': DevelopmentConfig,
     'test': DevelopmentConfig
 }
