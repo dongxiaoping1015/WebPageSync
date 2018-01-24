@@ -30,7 +30,7 @@ def create_app(config_name, register_blueprint=True):
     db.init_app(app)
 
     blue_config = (
-        ('web.base_api', '/api'),
+        ('user.user', '/user'),
     )
 
     register_views(app, blue_config)
