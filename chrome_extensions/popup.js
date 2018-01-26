@@ -43,42 +43,66 @@ function getSSID(callback) {
         }
     });
 }
-
+function getUserInfo(ssid, callback) {
+    var xhr = new XMLHttpRequest();
+    //xhr.onreadystatechange = handleStateChange; // Implemented elsewhere.
+    //ssid(登陆后)/收藏夹ID/URL/
+    var title = document.getElementById("title").value;
+    console.log(title)
+    xhr.open("GET", "http://127.0.0.1:5000/user?ssid="+ssid, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+        // 警告! 这样处理有可能被注入恶意脚本!
+            callback(xhr.responseText);
+        }
+    }
+    xhr.send();
+}
 document.addEventListener('DOMContentLoaded', () => {
     getSSID((ssid) => {
         // 如果ssid存在 表示已登录
         if (ssid != null) {
-            document.getElementById("record").style.display="block";
-            document.getElementById("logOut").style.display="block";
-            getCurrentTab((tab) => {
-                if (tab != null) {
-                    console.log(tab.title);
-                document.getElementById("title").getAttributeNode("value").value = tab.title;
-                var record_now = document.getElementById("record_now");
-                record_now.addEventListener('click', () => {
-                    var xhr = new XMLHttpRequest();
-                    //xhr.onreadystatechange = handleStateChange; // Implemented elsewhere.
-                    //ssid(登陆后)/收藏夹ID/URL/
-                    var title = document.getElementById("title").value;
-                    console.log(title)
-                    xhr.open("POST", "http://127.0.0.1:5000/add?a="+tab.url+"&b="+ssid+"&c="+title, true);
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState == 4) {
-                        // 警告! 这样处理有可能被注入恶意脚本!
-                        alert(xhr.responseText);
+            getUserInfo(ssid, (userInfo) => {
+                if (userInfo != null) {
+                    document.getElementById("record").style.display="block";
+                    document.getElementById("logOut").style.display="block";
+                    // var data = JSON.parse(userInfo);
+                    // var username = userInfo['username']
+                    // var favoritelist = data['favoritelist']
+                    // for (var i=0; i<favoritelist.length;i++) {
+                        
+                    // }
+                    getCurrentTab((tab) => {
+                        if (tab != null) {
+                            
+                            document.getElementById("title").getAttributeNode("value").value = tab.title;
+                            var record_now = document.getElementById("record_now");
+                            record_now.addEventListener('click', () => {
+                                var xhr = new XMLHttpRequest();
+                                //xhr.onreadystatechange = handleStateChange; // Implemented elsewhere.
+                                //ssid(登陆后)/收藏夹ID/URL/
+                                var title = document.getElementById("title").value;
+                                console.log(title)
+                                xhr.open("POST", "http://127.0.0.1:5000/add?a="+tab.url+"&b="+ssid+"&c="+title, true);
+                                xhr.onreadystatechange = function() {
+                                    if (xhr.readyState == 4) {
+                                    // 警告! 这样处理有可能被注入恶意脚本!
+                                    alert(xhr.responseText);
+                                    }
+                                }
+                                xhr.send();
+                            });
                         }
-                    }
-                    xhr.send();
+                    });
+                var record_auto = document.getElementById("record_auto");
+                record_auto.addEventListener('click', () => {
+                    
+                });
+                var logout = document.getElementById("logout");
+                logout.addEventListener('select', () => {
+                    chrome.cookies.remove({"url": "http://127.0.0.1:5000", "name": "ssid"});
                 });
             }
-            });
-            var record_auto = document.getElementById("record_auto");
-            record_auto.addEventListener('click', () => {
-                
-            });
-            var record_t = document.getElementById("record_t");
-            record_t.addEventListener('click', () => {
-                
             });
     } else {
         // ssid不存在 需要登录
